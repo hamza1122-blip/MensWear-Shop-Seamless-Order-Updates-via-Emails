@@ -119,16 +119,6 @@ This automation can be integrated into any **e-commerce workflow** where order u
 
 ---
 
-## 📸 Screenshots  
-
-1. **Workflow in n8n:**  
-   ![MensWear Shop Workflow](./Screenshot-93.png)
-
-2. **Google Sheet Data:**  
-   ![MensWear Shop Google Sheet](./Screenshot-94.png)
-
----
-
 ## 🧑‍💻 Author  
 
 **Hamza Zafar**  
