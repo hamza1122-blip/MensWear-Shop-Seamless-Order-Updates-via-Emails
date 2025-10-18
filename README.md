@@ -142,3 +142,15 @@ Add dynamic email templates with customer names and products.
 Integrate automatic order updates from WooCommerce or Shopify.
 
 Include SMS notifications using Twilio or WhatsApp API.
+
+🏁 How to Use
+
+Clone the repository.
+
+Import the workflow JSON file into n8n.
+
+Connect your Google Sheets and Gmail credentials.
+
+Update the Sheet ID and email templates.
+
+Execute the workflow manually or schedule it with Cron.
