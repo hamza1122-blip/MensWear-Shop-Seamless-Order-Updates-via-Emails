@@ -1,0 +1,481 @@
+{
+  "name": "MensWear Shop  Seamless Order Updates Via Emails",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        -256
+      ],
+      "id": "20a7f78c-b293-45df-a0b2-c77683bf7717",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DRX220zs-6W3Ln-IOj0goU_wEGJaFK-GRghO6FRTeHY",
+          "mode": "list",
+          "cachedResultName": "MensWear Shop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DRX220zs-6W3Ln-IOj0goU_wEGJaFK-GRghO6FRTeHY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DRX220zs-6W3Ln-IOj0goU_wEGJaFK-GRghO6FRTeHY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -672,
+        -256
+      ],
+      "id": "84db2e8f-f877-4ec4-9ee5-4b363bebaf99",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "i4VDcNtGkncidpHs",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "df36d527-e111-4524-bc64-d398acc6c8a1",
+              "leftValue": "={{ $json['Order Status'] }}",
+              "rightValue": "Delivered",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        -256
+      ],
+      "id": "7e4196a7-5a94-419d-ad16-c636dc85d32a",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Get row(s) in sheet').item.json['Order Status'] }}",
+                    "rightValue": "Returned",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "08d97999-551b-4920-8903-c2fad99e62aa"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2025bac7-991b-420c-968a-688b7665cc20",
+                    "leftValue": "={{ $('Get row(s) in sheet').item.json['Order Status'] }}",
+                    "rightValue": "Cancelled",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b2a5cb0b-9d74-4b46-816a-5a14c845b7f1",
+                    "leftValue": "={{ $('Get row(s) in sheet').item.json['Order Status'] }}",
+                    "rightValue": "Refund",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9d9f295f-5e7c-4afe-91b7-8a9f479c635b",
+                    "leftValue": "={{ $('Get row(s) in sheet').item.json['Order Status'] }}",
+                    "rightValue": "Processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -224,
+        -288
+      ],
+      "id": "4ed1ad42-afe7-487e-aca8-f036371369fb",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Order Returned",
+        "message": "=Dear {{ $json['Customer Name'] }}\nThank you for contacting us. We’ve received your request to return {{ $json.Product }} from your order {{ $json['Customer ID'] }}.\n\nOur team is reviewing your request and will share the return instructions shortly. Please ensure the item is unused and in its original packaging.\n\nIf you have any questions, feel free to reply to this email.\n\nBest regards,\nMensWear Service Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -544
+      ],
+      "id": "8bf88393-c7cd-448c-9368-18950430cb21",
+      "name": "Order Returned",
+      "webhookId": "89a22e7e-6aff-4706-a263-3a11e17a95cb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "79h5BIrBoWN6krcH",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Order Cancelled",
+        "message": "=Dear  {{ $json['Customer Name'] }}\nThank you for contacting us. We’ve received your request to cancel your order {{ $json.Product }}.\nOur team is currently reviewing your request. Once it’s processed, you’ll receive a confirmation email along with any refund details (if applicable).\n\nIf you have any questions or wish to keep your order active, please reply to this email as soon as possible.\n\nBest regards,\nMensWear Service Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -352
+      ],
+      "id": "639ae5dd-84d4-4f62-bdf6-b8f98de9e938",
+      "name": "Order Cancelled",
+      "webhookId": "7b0ce661-1a77-4db0-b979-d30debc46edd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "79h5BIrBoWN6krcH",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Your Refund Request",
+        "message": "=Dear   {{ $('Get row(s) in sheet').item.json['Customer Name'] }}\nThank you for contacting us. We’ve received your request for a refund on your order {{ $('Get row(s) in sheet').item.json.Product }} .\nOur team is currently reviewing the details and will process your refund shortly. Once completed, you’ll receive a confirmation email along with the refund amount and transaction details.\n\nIf you have any questions or additional information to share, please reply to this email.\n\nBest regards,\nMensWear Service Team\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -160
+      ],
+      "id": "1e5059b8-99e3-41c9-838c-dda2d68d8827",
+      "name": "Refund Request",
+      "webhookId": "cd2ea72c-55ba-4889-8738-8cfcd41ff4e6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "79h5BIrBoWN6krcH",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Your Order is Now Being Processed",
+        "message": "=Dear  {{ $json['Customer Name'] }}\nGood news! Your order {{ $json.Product }} is now being processed. Our team is preparing your items and will ship them soon.\nOnce your order has been dispatched, we’ll send you a confirmation email with the tracking details.\n\nThank you for shopping with MensWear Shop\nBest regards,\nMensWear Service Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        32
+      ],
+      "id": "7c397ceb-d61a-4784-84f5-86758a2b0ff1",
+      "name": "Order Processing",
+      "webhookId": "01eb596c-3bf4-495c-a8f9-6c759d380953",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "79h5BIrBoWN6krcH",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        32
+      ],
+      "id": "9ae2ba8d-0e13-4873-9c15-324446f1c2b9",
+      "name": "Wait 15s",
+      "webhookId": "79a63785-4495-4179-8d8c-8ffe2af01d25"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -352
+      ],
+      "id": "a7caf5b7-06d5-4429-883b-d4a32d41da21",
+      "name": "Wait 3s",
+      "webhookId": "631b0158-c22c-42bd-8ce0-c234b7bac13f"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -544
+      ],
+      "id": "05ebd8f8-1558-4e42-9e89-75deee69d291",
+      "name": "Wait 10s",
+      "webhookId": "89289244-2270-4be7-8db0-ee720d5e063d"
+    },
+    {
+      "parameters": {
+        "amount": 6
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -160
+      ],
+      "id": "ce71d89e-8380-45e9-bc3a-bce702d4a249",
+      "name": "Wait 6s",
+      "webhookId": "b6ecb36b-355d-4419-ac05-e5cfd0ea9e86"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Wait 10s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 3s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 6s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 15s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order Returned": {
+      "main": [
+        []
+      ]
+    },
+    "Order Cancelled": {
+      "main": [
+        []
+      ]
+    },
+    "Refund Request": {
+      "main": [
+        []
+      ]
+    },
+    "Order Processing": {
+      "main": [
+        []
+      ]
+    },
+    "Wait 15s": {
+      "main": [
+        [
+          {
+            "node": "Order Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3s": {
+      "main": [
+        [
+          {
+            "node": "Order Cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 10s": {
+      "main": [
+        [
+          {
+            "node": "Order Returned",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 6s": {
+      "main": [
+        [
+          {
+            "node": "Refund Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fb4d1844-31db-4200-80df-b116dd2c5fd2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91c999ba8cb4641c259e7dc506cf1f39ca50377efc7ef2d47ec1f54d55729a26"
+  },
+  "id": "rjelg1IrW74VSL9k",
+  "tags": []
+}
